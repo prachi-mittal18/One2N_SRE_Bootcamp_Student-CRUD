@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Local environment files (used for docker-run env injection)
+.env
+.env.*

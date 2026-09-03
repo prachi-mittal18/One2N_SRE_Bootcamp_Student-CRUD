@@ -1,0 +1,19 @@
+# Build output (rebuilt inside the image; no need to send it in the context)
+target/
+bin/
+
+# VCS / IDE
+.git/
+.gitignore
+.gitattributes
+.idea/
+*.iml
+
+# Docs and non-runtime artifacts
+README.md
+*.postman_collection.json
+src/api.tests.http
+
+# Local env / secrets — never bake these into an image or build context
+.env
+.env.*
