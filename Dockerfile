@@ -37,6 +37,4 @@ COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8085
 
 # DB_URL / DB_USERNAME / DB_PASSWORD are read from application.properties
-# with in-memory H2 defaults, so no env vars are required to run, but can
-# be overridden at `docker run` time with -e or --env-file.
 ENTRYPOINT ["java", "-jar", "app.jar"]

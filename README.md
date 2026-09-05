@@ -15,7 +15,7 @@ The API provides endpoints to perform the following operations:
 
 * **Language:** Java 17+
 * **Framework:** Spring Boot (Spring Web, Spring Data JPA)
-* **Database:** H2 In-Memory Database
+* **Database:** PostgreSQL (containerized via docker-compose)
 * **Build Tool:** Maven 
 
 
@@ -37,88 +37,62 @@ The application will compile, package, and launch on port **8085**. Look for the
 `Tomcat started on port 8085 (http) with context path '/'`
 
 ---
-## 🐳 Running with Docker
+## 🐳 Running with Docker Compose
 
-The API can also be built and run as a Docker image. The `Dockerfile` uses a
-multi-stage build (a JDK-based stage to compile the jar, and a slim JRE-only
-Alpine-based stage to run it), so the final image doesn't ship Maven, the
-compiler, or the source code — just the runtime and the built jar.
+The API and its database run together via `docker-compose`, so you don't need to configure or start Postgres manually.
 
 ### Prerequisites
-* Docker installed and running.
-### Build the image
-Images are tagged using [semantic versioning](https://semver.org/) — the
-`latest` tag is intentionally not used.
+- `docker` (with Compose v2 — check via `docker compose version`)
+- `make`
 
+Don't have these yet? Run:
 ```bash
-make docker-build VERSION=0.1.0
+chmod +x scripts/setup.sh
+./scripts/setup.sh
 ```
 
-This is equivalent to running:
+This script auto-installs Docker and `make` on **Linux** and **macOS**.
+On **Windows**, run it from **Git Bash** — it will detect missing tools and print direct links/instructions to install them manually (Docker Desktop and `make` can't be safely auto-installed via script on Windows).
+
+### Run everything with one command
 ```bash
-docker build -t student-crud-api:0.1.0 .
+make compose-run
 ```
 
-If `VERSION` is omitted, it defaults to `0.1.0` (see the `Makefile`).
+This automatically, in order:
+1. **`db-up`** — starts the Postgres container (skips if already running)
+2. **`db-migrate`** — applies DB migrations via Flyway (safe to re-run)
+3. **`compose-build`** — builds the REST API docker image
+4. Starts the REST API container
 
-### Run the container
+### Running steps individually
 ```bash
-make docker-run VERSION=0.1.0
+make db-up          # 1. Start DB only
+make db-migrate      # 2. Apply migrations
+make compose-build   # 3. Build API image
+make compose-run     # 4. Re-runs 1–3 (safe) then starts API
 ```
 
-This publishes the container's port **8085** to the host and starts the app
-with its built-in defaults (in-memory H2 database).
-
-### Injecting environment variables at runtime
-The app reads `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD` from the environment
-at startup, falling back to the in-memory H2 defaults if they're not set —
-so no code or image rebuild is needed to point it at a different database.
-
-Create a `.env` file in the project root (this file is git-ignored and
-should never be committed):
-```env
-DB_URL=jdbc:h2:mem:studentdb
-DB_USERNAME=sa
-DB_PASSWORD=
-```
-
-Then run:
+### Stopping everything
 ```bash
-make docker-run VERSION=0.1.0
+make compose-stop
 ```
 
-`make docker-run` automatically picks up `.env` via `--env-file` if it
-exists. Equivalently, without `make`:
+## 📊 Database
+
+The application uses Postgres, running in its own container via docker-compose.
+
+To inspect the database directly:
 ```bash
-docker run --name student-crud-api -p 8085:8085 --env-file .env student-crud-api:0.1.0
+docker exec -it student-crud-db psql -U student -d studentdb
 ```
 
-Or inject individual variables directly with `-e`:
-```bash
-docker run --name student-crud-api -p 8085:8085 \
-  -e DB_URL=jdbc:h2:mem:studentdb \
-  -e DB_USERNAME=sa \
-  student-crud-api:0.1.0
-```
-
-### Stop the container
-```bash
-make docker-stop
-```
- 
----
-
-## 📊 Database Console
-
-The application uses an in-memory H2 database. You can inspect tables and run SQL queries through your web browser while the application is actively running:
-
-* **URL:** [http://localhost:8085/h2-console]
-* **JDBC URL:** `jdbc:h2:mem:studentdb`
-* **Username:** `sa`
-* **Password:** leave blank
-
----
-
+Or connect with a GUI tool (DBeaver, pgAdmin, etc.) using:
+* **Host:** `localhost`
+* **Port:** `5432`
+* **Database:** `studentdb`
+* **Username:** `student`
+* **Password:** `student`
 ## 🔌 API Endpoints Reference
 
 Use an API client like Postman, Insomnia, or `curl` to test the endpoints.

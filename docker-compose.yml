@@ -1,0 +1,50 @@
+#This tells Docker to store Postgres's actual data files in a named volume called db_data.
+#Now even a docker compose down (which removes containers) won't delete data — only an
+#explicit docker compose down -v (the -v flag) would.
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: student-crud-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: studentdb
+      POSTGRES_USER: student
+      POSTGRES_PASSWORD: student
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U student -d studentdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - student-crud-net
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: student-crud-api
+    restart: unless-stopped
+    ports:
+      - "8085:8085"
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/studentdb
+      DB_USERNAME: student
+      DB_PASSWORD: student
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - student-crud-net
+
+
+volumes:
+  db_data:
+
+networks:
+  student-crud-net:
+    name: student-crud-net
