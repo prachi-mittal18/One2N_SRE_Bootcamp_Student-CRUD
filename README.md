@@ -1,19 +1,18 @@
 # Student CRUD REST API
 
-A lightweight RESTful web service built with Java and Spring Boot to manage student records. This application implements fundamental CRUD (Create, Read, Update, Delete) operations and utilizes an in-memory H2 database for local development and testing.
-
-##  Features & Functional Requirements
+A lightweight RESTful web service built with Java and Spring Boot to manage student records. This application implements fundamental CRUD (Create, Read, Update, Delete) operations, using PostgreSQL as its database, containerized via Docker Compose.
+## Features & Functional Requirements
 
 The API provides endpoints to perform the following operations:
-* ➕ **Add a new student** to the system.
-* 📋 **Get all students** currently registered.
-* 🔍 **Get a student by ID** to view specific details.
-* ✏️ **Update existing student information** safely.
-* ❌ **Delete a student record** from the system.
+*  **Add a new student** to the system.
+*  **Get all students** currently registered.
+*  **Get a student by ID** to view specific details.
+*  **Update existing student information** safely.
+*  **Delete a student record** from the system.
 
-##  Tech Stack
+## Tech Stack
 
-* **Language:** Java 17+
+* **Language:** Java 21
 * **Framework:** Spring Boot (Spring Web, Spring Data JPA)
 * **Database:** PostgreSQL (containerized via docker-compose)
 * **Build Tool:** Maven 
@@ -24,14 +23,20 @@ The API provides endpoints to perform the following operations:
 Follow these steps to run the application on your local machine.
 
 ### Prerequisites
-* Java Development Kit (JDK) 17 or higher installed.
+* Java Development Kit (JDK) 21 or higher installed.
+* A PostgreSQL instance reachable at `localhost:5432` (the easiest way is `make db-up` — see the Docker Compose section below).
 
 ### Run the Application
-Since Windows environments do not natively support standard Makefiles without extra configuration, use the native Windows Maven wrapper script to start the server. Open your terminal in the project root folder and execute:
 
+**Git Bash / macOS / Linux:**
+```bash
+make run
+```
+**Windows Command Prompt/PowerShell** (no Git Bash):
 ```powershell
 .\mvnw.cmd spring-boot:run
 ```
+
 
 The application will compile, package, and launch on port **8085**. Look for the following lines in your console to confirm a successful launch:
 `Tomcat started on port 8085 (http) with context path '/'`
@@ -137,4 +142,10 @@ Use an API client like Postman, Insomnia, or `curl` to test the endpoints.
 
 ## 🛑 Stopping the Server
 
-To shut down the running server instance, click into your terminal window and press **`Ctrl + C`** on your keyboard.
+**If you ran it locally** (`make run` or `mvnw.cmd spring-boot:run`):
+Click into your terminal window and press **`Ctrl + C`**.
+
+**If you ran it via Docker Compose** (`make compose-run`):
+```bash
+make compose-stop
+```
