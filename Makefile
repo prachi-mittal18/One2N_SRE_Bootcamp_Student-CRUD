@@ -38,6 +38,9 @@ help:
 	@echo "  make docker-build - Build Docker image, tagged \$$(IMAGE_NAME):\$$(VERSION) (override VERSION=x.y.z)"
 	@echo "  make docker-run   - Run the image in a container, injecting env vars from \$$(ENV_FILE) if present"
 	@echo "  make docker-stop  - Stop and remove the running container"
+	@echo "  make db-connect   - Open an interactive psql shell(CLI to write queries) into the DB container"
+	@echo "  make db-tables    - List all tables in the database"
+	@echo "  make db-students  - Print all rows from the students table"
 
 init:
 	#chmod +x mvnw - this command does not run as it is not Windows compatible. used in linux/unix
@@ -78,7 +81,7 @@ docker-stop:
 
 
 
-# --- docker-compose based targets ---
+# --- docker-compose based targets --- in git bash
 DB_CONTAINER   = student-crud-db
 DB_NAME        = studentdb
 DB_USER        = student
@@ -124,3 +127,21 @@ compose-run: db-migrate compose-build
 ## Stop everything (db + api)
 compose-stop:
 	docker compose down
+
+
+
+# --- db targets ---
+
+.PHONY: db-connect db-tables db-students
+
+## Open an interactive psql shell into the running DB container(CLI  to run queries)
+db-connect:
+	docker exec -it $(DB_CONTAINER) psql -U $(DB_USER) -d $(DB_NAME)
+
+## List all tables in the database (quick one-shot check, no interactive shell)
+db-tables:
+	docker exec -it $(DB_CONTAINER) psql -U $(DB_USER) -d $(DB_NAME) -c "\dt"
+
+## Print all rows from the students table (adjust table name if yours differs)
+db-students:
+	docker exec -it $(DB_CONTAINER) psql -U $(DB_USER) -d $(DB_NAME) -c "SELECT * FROM student;"
