@@ -24,7 +24,7 @@ CONTAINER_PORT = 8085
 ENV_FILE ?= .env
 #Lines starting with .PHONY tell 'make' that these are action names (commands to run),
 #not actual files on your computer.
-.PHONY: all help init build run test clean docker-build docker-run docker-stop
+.PHONY: all help init build run test clean docker-build docker-run docker-stop lint docker-push
 
 all: build
 
@@ -55,12 +55,19 @@ run:
 
 test:
 	mvnw.cmd test
+#//make lint runs Checkstyle, which scans your Java code for style/quality issues
+#//without running the app or the tests
+lint:
+	mvnw.cmd checkstyle:check
 
 clean:
 	mvnw.cmd clean
 
 docker-build:
 	docker build -t $(IMAGE_NAME):$(VERSION) .
+
+docker-push:
+	docker push $(IMAGE_NAME):$(VERSION)
 
 # Injects environment variables at runtime via --env-file if it exists,
 # otherwise falls back to the app's built-in defaults (in-memory H2).
