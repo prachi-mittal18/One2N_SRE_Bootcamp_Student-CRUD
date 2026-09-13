@@ -26,8 +26,8 @@ ENV_FILE ?= .env
 #not actual files on your computer.
 .PHONY: all help init build run test clean docker-build docker-run docker-stop lint docker-push
 
-SHELL := bash.exe
-.SHELLFLAGS := -c
+#SHELL := bash.exe
+#.SHELLFLAGS := -c
 
 all: build
 
@@ -50,21 +50,21 @@ init:
 	@echo Environment ready for Windows build.
 
 build:
-	./mvnw  clean package -DskipTests
+	bash -c "./mvnw clean package -DskipTests"
 
 # runs the code in the local system
 run:
-	./mvnw spring-boot:run
+	bash -c "./mvnw spring-boot:run"
 
 test:
-	./mvnw test
+	bash -c "./mvnw test"
 #//make lint runs Checkstyle, which scans your Java code for style/quality issues
 #//without running the app or the tests
 lint:
-	./mvnw checkstyle:check
+	bash -c "./mvnw checkstyle:check"
 
 clean:
-	./mvnw clean
+	bash -c "./mvnw clean"
 
 docker-build:
 	docker build -t $(IMAGE_NAME):$(VERSION) .
