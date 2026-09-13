@@ -26,6 +26,9 @@ ENV_FILE ?= .env
 #not actual files on your computer.
 .PHONY: all help init build run test clean docker-build docker-run docker-stop lint docker-push
 
+SHELL := bash.exe
+.SHELLFLAGS := -c
+
 all: build
 
 help:
