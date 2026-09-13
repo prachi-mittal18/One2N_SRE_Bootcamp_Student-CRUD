@@ -24,7 +24,10 @@ CONTAINER_PORT = 8085
 ENV_FILE ?= .env
 #Lines starting with .PHONY tell 'make' that these are action names (commands to run),
 #not actual files on your computer.
-.PHONY: all help init build run test clean docker-build docker-run docker-stop
+.PHONY: all help init build run test clean docker-build docker-run docker-stop lint docker-push
+
+#SHELL := bash.exe
+#.SHELLFLAGS := -c
 
 all: build
 
@@ -47,20 +50,27 @@ init:
 	@echo Environment ready for Windows build.
 
 build:
-	mvnw.cmd clean package -DskipTests
+	bash -c "./mvnw clean package -DskipTests"
 
 # runs the code in the local system
 run:
-	mvnw.cmd spring-boot:run
+	bash -c "./mvnw spring-boot:run"
 
 test:
-	mvnw.cmd test
+	bash -c "./mvnw test"
+#//make lint runs Checkstyle, which scans your Java code for style/quality issues
+#//without running the app or the tests
+lint:
+	bash -c "./mvnw checkstyle:check"
 
 clean:
-	mvnw.cmd clean
+	bash -c "./mvnw clean"
 
 docker-build:
 	docker build -t $(IMAGE_NAME):$(VERSION) .
+
+docker-push:
+	docker push $(IMAGE_NAME):$(VERSION)
 
 # Injects environment variables at runtime via --env-file if it exists,
 # otherwise falls back to the app's built-in defaults (in-memory H2).
