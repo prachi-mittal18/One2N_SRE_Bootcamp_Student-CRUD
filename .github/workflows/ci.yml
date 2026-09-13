@@ -43,9 +43,12 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Docker build and push
+        env:
+          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+          IMAGE_VERSION: ${{ github.sha }}
         run: |
-          make docker-build IMAGE_NAME=${{ secrets.DOCKERHUB_USERNAME }}/student-crud-api VERSION=${{ github.sha }}
-          make docker-push IMAGE_NAME=${{ secrets.DOCKERHUB_USERNAME }}/student-crud-api VERSION=${{ github.sha }}
+          make docker-build IMAGE_NAME=$DOCKERHUB_USER/student-crud-api VERSION=$IMAGE_VERSION
+          make docker-push IMAGE_NAME=$DOCKERHUB_USER/student-crud-api VERSION=$IMAGE_VERSION
 
       - name: Stop database
         if: always()
