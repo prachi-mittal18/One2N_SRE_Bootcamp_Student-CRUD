@@ -47,21 +47,21 @@ init:
 	@echo Environment ready for Windows build.
 
 build:
-	mvnw.cmd clean package -DskipTests
+	./mvnw  clean package -DskipTests
 
 # runs the code in the local system
 run:
-	mvnw.cmd spring-boot:run
+	./mvnw spring-boot:run
 
 test:
-	mvnw.cmd test
+	./mvnw test
 #//make lint runs Checkstyle, which scans your Java code for style/quality issues
 #//without running the app or the tests
 lint:
-	mvnw.cmd checkstyle:check
+	./mvnw checkstyle:check
 
 clean:
-	mvnw.cmd clean
+	./mvnw clean
 
 docker-build:
 	docker build -t $(IMAGE_NAME):$(VERSION) .
