@@ -128,11 +128,11 @@ db-migrate: db-up
 
 ## 3. Build the REST API docker image via docker-compose
 compose-build:
-	docker compose build api
+	docker compose build api1
 
 ## 4. Run the REST API docker container — ensures DB is up + migrated first
 compose-run: db-migrate compose-build
-	docker compose up -d api
+	docker compose up -d api1 api2 nginx
 
 ## Stop everything (db + api)
 compose-stop:
@@ -155,3 +155,28 @@ db-tables:
 ## Print all rows from the students table (adjust table name if yours differs)
 db-students:
 	docker exec -it $(DB_CONTAINER) psql -U $(DB_USER) -d $(DB_NAME) -c "SELECT * FROM student;"
+
+
+# --- vagrant targets ---
+
+.PHONY: vagrant-up vagrant-provision vagrant-ssh vagrant-halt vagrant-destroy
+
+## Create (or start) the production VM and run provisioning
+vagrant-up:
+	vagrant up
+
+## Re-run the provisioning script on an existing VM
+vagrant-provision:
+	vagrant provision
+
+## SSH into the VM
+vagrant-ssh:
+	vagrant ssh
+
+## Stop the VM without destroying it
+vagrant-halt:
+	vagrant halt
+
+## Completely delete the VM
+vagrant-destroy:
+	vagrant destroy -f
