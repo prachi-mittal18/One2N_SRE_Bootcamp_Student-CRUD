@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: api-db-secret
+type: Opaque
+stringData:
+  DB_URL: jdbc:postgresql://postgres-svc:5432/studentdb
+  DB_USERNAME: student
+  DB_PASSWORD: student
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: student-api
+  labels:
+    app: student-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: student-api
+  template:
+    metadata:
+      labels:
+        app: student-api
+    spec:
+      nodeSelector:
+        type: application
+      containers:
+        - name: student-api
+          image: student-crud-api:0.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8085
+          envFrom:
+            - secretRef:
+                name: api-db-secret
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 8085
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 8085
+            initialDelaySeconds: 20
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: student-api-svc
+spec:
+  selector:
+    app: student-api
+  ports:
+    - port: 8085
+      targetPort: 8085
